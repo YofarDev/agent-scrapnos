@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
 
 
-def prompt_model(system_prompt, prompt, model="gemini-exp-1121"):
+def prompt_model(system_prompt, prompt, model="gemini-2.0-flash-exp"):
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
     genai.configure(api_key=api_key)
@@ -19,3 +19,4 @@ def prompt_model(system_prompt, prompt, model="gemini-exp-1121"):
             HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
         },
     )
+    return response.text
