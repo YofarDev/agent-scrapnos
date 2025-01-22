@@ -2,6 +2,8 @@
 
 A simple Python-based agent to scrape images with function calling [training purpose].
 
+![Agent Scrapnos Preview](screen.png)
+
 ## Installation
 
 1. Clone the repository:
