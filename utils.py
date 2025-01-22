@@ -23,10 +23,11 @@ def extract_json_from_string(input_string):
 
 
 def save_urls_as_images(list_urls, folder_name):
+    os.makedirs("output", exist_ok=True)
     os.makedirs(folder_name, exist_ok=True)
     for u in list_urls:
         response = requests.get(u)
-        with open(f"{folder_name}/{u.split('/')[-1]}", "wb") as f:
+        with open(f"output/{folder_name}/{u.split('/')[-1]}", "wb") as f:
             f.write(response.content)
     return "success"
 

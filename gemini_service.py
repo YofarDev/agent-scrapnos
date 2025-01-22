@@ -1,5 +1,4 @@
 import os
-
 import google.generativeai as genai
 from dotenv import load_dotenv
 from google.generativeai.types import HarmBlockThreshold, HarmCategory
