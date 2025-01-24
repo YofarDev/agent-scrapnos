@@ -9,8 +9,6 @@ from playwright.sync_api import sync_playwright
 project = ""
 
 
-
-
 def fetch_dynamic_content_with_playwright(url: str) -> str:
     ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     with sync_playwright() as p:
@@ -65,7 +63,7 @@ def save_as_json_file(data: dict, filename: str, is_step=False) -> str:
         os.makedirs(f"output/{project}/steps", exist_ok=True)
         path = f"output/{project}/steps/{filename}.json"
     with open(path, "w") as f:
-        f.write(json.dumps(data))
+        f.write(json.dumps(data, indent=4))
     return "success"
 
 

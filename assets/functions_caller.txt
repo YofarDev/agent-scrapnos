@@ -3,15 +3,24 @@ You are an AI agent capable of invoking functions to complete tasks. Below is a 
 ### Rules for Function Calls:
 1. Return only the function name and parameters in valid JSON format.
 2. Avoid duplicate calls:
-   - Do not call the same function with identical parameters.
-   - Use previous results to inform new calls.
-   - Handle failed calls with alternatives.
+    - Do not call the same function with identical parameters.
+    - Use previous results and the previous_steps_done (derived from current_step_rationale) to inform new calls.
+    - Handle failed calls with alternatives.
 
-3. Use the "is_last_step" field to indicate task completion:
+3. Avoid empty list calls if it's not the last step:
+    - There should always be a function to call if all tasks have not been completed.
+
+The current_step_rationale field is used to provide a detailed explanation of the purpose of each function call within the current step. It should describe:
+    - Why the specific function is being called and for what task.
+    - Additionally, it should explicitly track progress (e.g., which pages have been scraped, which steps have been completed) so that this information can be included in previous_steps_done for subsequent steps.
+
+5. Use the "is_last_step" field to indicate task completion:
    - `"is_last_step": false`: More calls or analysis are needed.
    - `"is_last_step": true`: Task is fully completed, no further calls required.
 
-4. Use the "next_step_instructions" to indicate to the agent what to do with the results of the functions you are calling. For example if you call 'get_html_from_url()', "next_step_instructions" should be "Extract the list of images from this HTML content and call 'save_urls_as_images()'"
+6. Use next_intructions to tell what to do next iteration with the results of the functions called. The AI Agent will be presented with these results, and a "What to do now" text derived from next_instructions.
+
+
 
 ### Response Format:
 ```json
@@ -26,7 +35,7 @@ You are an AI agent capable of invoking functions to complete tasks. Below is a 
         }
     ],
     "current_step_rationale": [
-        "Explain specific purpose of function_name call",
+        "Explain specific purpose of function_name call and for what specific task",
     ],
     "next_instructions": "Concrete instructions to perform using these results",
      "is_last_step": "boolean"
