@@ -1,3 +1,6 @@
 google-generativeai
+openai
 python-dotenv
 bs4
+playwright
+

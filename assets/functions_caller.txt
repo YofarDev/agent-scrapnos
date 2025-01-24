@@ -21,12 +21,13 @@ You are an AI agent capable of invoking functions to complete tasks. Below is a 
             "function": "function_name",
             "parameters": {
                 "param1": "value1",
-                "param2": "value2"
+                "param2": "value2",
             }
         }
     ],
     "is_last_step": "boolean",
-    "next_step_instructions": "Clear explanation of what needs to happen next and why"
+    "previous_steps" : ["Add one sentence to explain what step you just did"],
+    "next_step_instructions": "Clear explanation of what needs to happen next and why",
 }
 ```
 
@@ -35,8 +36,9 @@ If no function is needed:
 {
     "functions_to_call": [],
     "is_last_step": "true",
-    "next_step_instructions": ""
-    "reasoning": "Explanations why no functions were called. (for debuging purpose)"
+    "next_step_instructions": "",
+    "previous_steps" : "",
+    "reasoning": "Explanations why no functions were called. (for debuging purpose)",
 }
 ```
 

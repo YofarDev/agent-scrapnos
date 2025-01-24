@@ -1,68 +1,108 @@
+import datetime
+import json
+import os
 import time
 
-import gemini_service
+import llm_service
 import utils
+from models.llm_api import LLM_API
 
 functions = [
+    "fetch_static_html_with_requests(String url)",
+    "fetch_dynamic_content_with_playwright(String url)",
     "save_urls_as_images(List<String> list_urls, String folder_name)",
-    "get_html_from_url(String url)",
+    "save_as_txt_file(String txt, String filename)",
+    "save_as_json_file(Map<String, Object> data, String filename)",
+    "open_file_as_string(String filename)",
 ]
 
 
-def function_calling_wrapper(prompt):
+def function_calling_wrapper(prompt: str, api: LLM_API):
+    project = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    utils.project = project
+    os.makedirs(f"output/{project}", exist_ok=True)
     is_last_step = False
     i = 0
     results = ""
-    next_step_instructions = ""
     while not is_last_step:
         # Temporary hard coded limit
         if i == 20:
             break
-        time.sleep(0.5)
+        time.sleep(1)
         json_response = check_functions(
+            api=api,
+            project=project,
             prompt=prompt,
             count=i,
             previous_results=results,
-            next_step_instructions=next_step_instructions,
         )
         results = ""
-        next_step_instructions = ""
         print(f"{json_response} [{i}] ")
         if json_response == "" or json_response["functions_to_call"] == []:
             return results
         for function in json_response["functions_to_call"]:
-            if function["function"] == "save_urls_as_images":
+            if function["function"] == "fetch_static_html_with_requests":
+                html = utils.fetch_static_html_with_requests(
+                    function["parameters"]["url"]
+                )
+                results += f"{function['function']} {function['parameters']['url']} : \n{html}"
+            elif function["function"] == "fetch_dynamic_content_with_playwright":
+                html = utils.fetch_dynamic_content_with_playwright(
+                    function["parameters"]["url"]
+                )
+                results += f"{function['function']} {function['parameters']['url']} : \n{html}"
+            elif function["function"] == "save_urls_as_images":
                 result = utils.save_urls_as_images(
                     function["parameters"]["list_urls"],
                     function["parameters"]["folder_name"],
                 )
                 results += f"{function['function']} : \n{result}"
-            elif function["function"] == "get_html_from_url":
-                html = utils.get_html_from_url(function["parameters"]["url"])
-                results += (
-                    f"{function['function']} {function['parameters']['url']} : \n{html}"
+            elif function["function"] == "save_as_txt_file":
+                result = utils.save_as_txt_file(
+                    function["parameters"]["txt"], function["parameters"]["filename"]
                 )
-        i += 1
+                results += f"{function['function']} : \n{result}"
+            elif function["function"] == "save_as_json_file":
+                result = utils.save_as_json_file(
+                    function["parameters"]["data"], function["parameters"]["filename"]
+                )
+                results += f"{function['function']} : \n{result}"
+            elif function["function"] == "open_file_as_string":
+                result = utils.open_file_as_string(function["parameters"]["filename"])
+                results += f"{function['function']} : \n{result}"
         is_last_step = (
-            json_response["is_last_step"] == "true"
-            or json_response["is_last_step"]
+            json_response["is_last_step"] == "true" or json_response["is_last_step"]
         )
-        next_step_instructions = json_response["next_step_instructions"]
+        save_json_as_file(json_response, f"step_{i}", project)
+        i += 1
 
 
-def check_functions(prompt, count, previous_results, next_step_instructions):
+def check_functions(
+    project: str, prompt: str, count: int, previous_results: str, api: LLM_API
+):
     p = f"""
     Initial request : {prompt}
     Iteration count : {count}
     """
     if count > 0:
+        json_data = load_json(project, count - 1)
         p += f"Previous results :\n{previous_results}"
-        p += f"Next step instructions :\n{next_step_instructions}"
+        p += f"Previous steps :\n{json_data['previous_steps']}"
+        p += f"Next step instructions :\n{json_data['next_step_instructions']}"
     with open("assets/functions_caller.txt") as f:
         sp = f.read()
     functions_str = "\n".join(functions)
     sp = sp.replace("$FUNCTIONS_LIST", functions_str)
-    response = gemini_service.prompt_model(prompt=p, system_prompt=sp)
+    response = llm_service.prompt_llm(prompt=p, system_prompt=sp, api=api)
     json_response = utils.extract_json_from_string(response)
     return json_response
 
+
+def save_json_as_file(json_data, filename, project):
+    with open(f"output/{project}/{filename}.json", "w") as f:
+        f.write(json.dumps(json_data, indent=4))
+
+
+def load_json(project, step):
+    with open(f"output/{project}/step_{step}.json", "r") as f:
+        return json.load(f)
