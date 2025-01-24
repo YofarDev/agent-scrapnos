@@ -1,8 +1,9 @@
+<img src="agent-scrapnos.png" alt="Agent Scrapnos" width="200" height="200">
 # Agent Scrapnos
 
 A simple Python-based agent to scrape web content with function calling [WIP].
 
-![Agent Scrapnos Preview](screen.png)
+![Example prompt](screen.png)
 
 ## Installation
 
