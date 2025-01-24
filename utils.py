@@ -1,7 +1,7 @@
 import json
 import os
 import re
-
+import time
 import requests
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
@@ -27,17 +27,31 @@ def fetch_dynamic_content_with_playwright(url: str) -> str:
         return content
 
 
-def fetch_static_html_with_requests(url):
+
+
+def fetch_static_html_body_only(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, "html.parser")
-    return soup.prettify()
+    
+    # Remove all <script> tags
+    for script in soup.find_all("script"):
+        script.decompose()
+    
+    # Extract only the <body> content
+    body_content = soup.body
+    
+    return body_content.prettify() if body_content else ""
 
 
-def save_as_txt_file(txt: str, filename: str) -> str:
-    with open(f"output/{project}/{filename}", "w") as f:
+def save_as_txt_file(txt: str, filename: str, is_step=False) -> str:
+    path = f"output/{project}/{filename}.txt"
+    if is_step:
+        os.makedirs(f"output/{project}/steps", exist_ok=True)
+        path = f"output/{project}/steps/{filename}.txt"
+    with open(path, "w") as f:
         f.write(txt)
     return "success"
 
@@ -45,8 +59,12 @@ def save_as_txt_file(txt: str, filename: str) -> str:
 
 
 
-def save_as_json_file(data: dict, filename: str) -> str:
-    with open(f"output/{project}/{filename}.json", "w") as f:
+def save_as_json_file(data: dict, filename: str, is_step=False) -> str:
+    path = f"output/{project}/{filename}.json"
+    if is_step:
+        os.makedirs(f"output/{project}/steps", exist_ok=True)
+        path = f"output/{project}/steps/{filename}.json"
+    with open(path, "w") as f:
         f.write(json.dumps(data))
     return "success"
 
@@ -68,11 +86,11 @@ def extract_json_from_string(input_string):
 
 
 def save_urls_as_images(list_urls, folder_name):
-    os.makedirs("output", exist_ok=True)
-    os.makedirs(folder_name, exist_ok=True)
+    os.makedirs(f"output/{project}/images/{folder_name}", exist_ok=True)
     for u in list_urls:
+        time.sleep(0.2)
         response = requests.get(u)
-        with open(f"output/{project}/{folder_name}/{u.split('/')[-1]}", "wb") as f:
+        with open(f"output/{project}/images/{folder_name}/{u.split('/')[-1]}", "wb") as f:
             f.write(response.content)
     return "success"
 

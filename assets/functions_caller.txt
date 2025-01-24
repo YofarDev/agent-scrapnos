@@ -25,9 +25,11 @@ You are an AI agent capable of invoking functions to complete tasks. Below is a 
             }
         }
     ],
-    "is_last_step": "boolean",
-    "previous_steps" : ["Add one sentence to explain what step you just did"],
-    "next_step_instructions": "Clear explanation of what needs to happen next and why",
+    "current_step_rationale": [
+        "Explain specific purpose of function_name call",
+    ],
+    "next_instructions": "Concrete instructions to perform using these results",
+     "is_last_step": "boolean"
 }
 ```
 
@@ -36,8 +38,6 @@ If no function is needed:
 {
     "functions_to_call": [],
     "is_last_step": "true",
-    "next_step_instructions": "",
-    "previous_steps" : "",
     "reasoning": "Explanations why no functions were called. (for debuging purpose)",
 }
 ```
