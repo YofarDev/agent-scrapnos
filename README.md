@@ -21,6 +21,7 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 3. Install dependencies:
 ```bash
 pip install -r requirements.txt
+playwright install
 ```
 
 4. Copy the environment template:
@@ -29,3 +30,5 @@ cp .env-template .env
 ```
 
 5. Configure your .env file with appropriate credentials
+
+
