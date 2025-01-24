@@ -14,20 +14,23 @@ def run_scrapnos(prompt):
         is_gemini=True,
         delay_ms=1000,
     )
-    #     deepseek = LLM_API(
-    #         model="deepseek-chat",
-    #         api_key=os.getenv("DEEPSEEK_API_KEY"),
-    #         is_gemini=False,
-    #         url="https://api.deepseek.com/",
-    #         delay_ms=1000,
-    # )
-    fc.function_calling_wrapper(prompt, gemini)
+    deepseek = LLM_API(
+        model="deepseek-chat",
+        api_key=os.getenv("DEEPSEEK_API_KEY"),
+        is_gemini=False,
+        url="https://api.deepseek.com/",
+        delay_ms=1000,
+    )
+    fc.function_calling_wrapper(prompt, deepseek)
 
 
-prompt = """
-Scrap the images from the movie My neighbor Totoro for the first 5 pages of https://fancaps.net/movies/MovieImages.php?name=My_Neighbor_Totoro&movieid=1492&page=.
-The images on the pages are the thumbnails, but I want the original ones. To get them add the prefix https://mvcdn.fancaps.net/ + the id of the image and the extension. 
-Do it a page at a time, save it in a 'Totoro' folder.
-"""
+# prompt = """
+# Scrap the images from the movie My neighbor Totoro for the first 5 pages of https://fancaps.net/movies/MovieImages.php?name=My_Neighbor_Totoro&movieid=1492&page=.
+# The images on the pages are the thumbnails, but I want the original ones. To get them add the prefix https://mvcdn.fancaps.net/ + the id of the image and the extension.
+# Do it a page at a time, save it in a 'Totoro' folder.
+# """
+
+prompt = "Save the list of museums from la Loire as csv : https://en.wikipedia.org/wiki/List_of_museums_in_France"
 
 run_scrapnos(prompt)
+

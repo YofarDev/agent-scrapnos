@@ -2,3 +2,5 @@
 venv
 .envrc
 output
+__pycache__
+models/__pycache__

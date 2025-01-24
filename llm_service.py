@@ -27,6 +27,7 @@ def prompt_gemini(system_prompt: str, prompt: str, api: LLM_API):
     model = genai.GenerativeModel(api.model, system_instruction=system_prompt)
     response = model.generate_content(
         prompt,
+        stream=True,
         safety_settings={
             HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
             HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
@@ -34,7 +35,10 @@ def prompt_gemini(system_prompt: str, prompt: str, api: LLM_API):
             HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
         },
     )
-    return response.text
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+    return full_response
 
 
 def prompt_openai(system_prompt: str, prompt: str, api: LLM_API) -> str:
@@ -45,7 +49,10 @@ def prompt_openai(system_prompt: str, prompt: str, api: LLM_API) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
         ],
-        stream=False,
+        stream=True,
         max_tokens=8192,
     )
-    return response.choices[0].message.content
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.choices[0].delta.content
+    return full_response
