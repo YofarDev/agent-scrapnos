@@ -1,4 +1,6 @@
+<div style="text-align: center;">
 <img src="agent-scrapnos.png" alt="Agent Scrapnos" width="200" height="200">
+</div>
 
 ## Agent Scrapnos
 
